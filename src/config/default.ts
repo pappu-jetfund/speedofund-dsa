@@ -9,7 +9,6 @@ export const env = {
   dbUsername: process.env.MYSQL_USER || '',
   dbPassword: process.env.MYSQL_PASSWORD || '',
   dbDatabase: process.env.MYSQL_DATABASE || '',
-  databaseUrlMongo: process.env.DATABASE_URL_MONGO || '',
   defaultUtmSource: process.env.DEFAULT_UTM_SOURCE || 'app_v1',
   logDir: process.env.LOG_DIR || '../logs',
 };

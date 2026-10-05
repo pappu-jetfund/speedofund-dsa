@@ -134,6 +134,7 @@ export const leadCheckMiddleware = async (
     }
 
     req.body.utmSource = getApiKeys.client_name;
+    res.locals.resolvedApiKey = getApiKeys;
     next();
   } catch (error) {
     logger.error({ err: error }, `leadCheckMiddleware failed method=${req.method}`);

@@ -94,7 +94,7 @@ class AttributionService {
       `Active attribution found customerID=${customer.customerID}, attributionID=${checkAttribution?.id}, source=${checkAttribution?.source}, expiryDate=${checkAttribution?.expiryDate}`,
     );
 
-    if (checkAttribution.expiryDate > new Date()) {
+    if (new Date(checkAttribution.expiryDate) > new Date()) {
       if (checkAttribution.source !== utm) {
         return {
           success: false,
@@ -174,26 +174,13 @@ class AttributionService {
 
       if (shouldInsertAttribution) {
         const knex = getKnexInstance();
-        const reff = await this.referrerModel.ReferrerKnex.select('referrer', 'ad_info')
+        const reff = await this.referrerModel.ReferrerKnex.select('referrer')
           .where('mobile', mobile)
           .andWhere('created_at', '>=', knex.raw('NOW() - INTERVAL 30 DAY'))
           .orderBy('id', 'desc')
           .first();
 
         const source = reff?.referrer || utm;
-        let adInfo: any[] = [];
-        try { adInfo = JSON.parse(reff?.ad_info || '[]'); } catch (_) {}
-
-        let att = '', atdt = '', camp = '', gaid = '', apv = '', trackingid = '';
-        if (Array.isArray(adInfo) && adInfo.length > 0) {
-          const first = adInfo[0];
-          att = first?.att || '';
-          atdt = first?.atdt || '';
-          camp = first?.camp || '';
-          gaid = first?.gaid || '';
-          apv = first?.apv || '';
-          trackingid = first?.trackingid || '';
-        }
 
         const insertedID = await this.attributionsModel.insert({
           customerID,
@@ -202,12 +189,6 @@ class AttributionService {
           campaign: '',
           createdDate: new Date(),
           expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          att,
-          atdt,
-          camp,
-          gaid,
-          apv,
-          trackingid,
         });
 
         return { success: true, message: 'Attributed Successfully', attributionID: insertedID };
